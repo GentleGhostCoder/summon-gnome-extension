@@ -1,0 +1,9 @@
+{
+  "name": "Dropdown Terminal",
+  "description": "Quake-style dropdown terminal with support for custom terminal emulators (Alacritty, Kitty, Wezterm, etc.)",
+  "uuid": "dropdown-terminal@chronolite.tech",
+  "shell-version": ["45", "46", "47", "48", "49"],
+  "version": 2,
+  "url": "https://github.com/chronolite/dropdown-terminal",
+  "settings-schema": "org.gnome.shell.extensions.dropdown-terminal"
+}

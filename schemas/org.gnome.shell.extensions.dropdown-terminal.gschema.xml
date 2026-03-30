@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.dropdown-terminal"
+          path="/org/gnome/shell/extensions/dropdown-terminal/">
+
+    <!-- Keybinding -->
+    <key name="toggle-dropdown" type="as">
+      <default>['&lt;Control&gt;Return']</default>
+      <summary>Toggle dropdown terminal</summary>
+      <description>Keyboard shortcut to show/hide the dropdown terminal</description>
+    </key>
+
+    <!-- Terminal -->
+    <key name="terminal" type="s">
+      <default>'auto'</default>
+      <summary>Terminal emulator</summary>
+      <description>Terminal emulator to use: 'auto' detects the best available, or choose a specific terminal</description>
+    </key>
+
+    <key name="terminal-args" type="s">
+      <default>''</default>
+      <summary>Terminal arguments</summary>
+      <description>Additional arguments passed to the terminal emulator</description>
+    </key>
+
+    <key name="startup-command" type="s">
+      <default>''</default>
+      <summary>Startup command</summary>
+      <description>Command to run inside the terminal on launch (e.g., 'tmux new-session -A -s main'). Leave empty for a default shell.</description>
+    </key>
+
+    <!-- Appearance -->
+    <key name="width-percent" type="i">
+      <default>100</default>
+      <range min="10" max="100"/>
+      <summary>Width percentage</summary>
+      <description>Width of the dropdown as percentage of monitor width</description>
+    </key>
+
+    <key name="height-percent" type="i">
+      <default>50</default>
+      <range min="10" max="100"/>
+      <summary>Height percentage</summary>
+      <description>Height of the dropdown as percentage of monitor height</description>
+    </key>
+
+    <key name="position" type="s">
+      <default>'top'</default>
+      <summary>Position</summary>
+      <description>Position of dropdown: 'top' or 'bottom'</description>
+    </key>
+
+    <key name="monitor" type="s">
+      <default>'current'</default>
+      <summary>Monitor</summary>
+      <description>Monitor to show terminal on: 'current', 'primary', or monitor index</description>
+    </key>
+
+    <key name="fullscreen" type="b">
+      <default>false</default>
+      <summary>Fullscreen</summary>
+      <description>Maximize the terminal to fill the entire work area (respects panel/dock)</description>
+    </key>
+
+    <key name="animation-duration" type="i">
+      <default>150</default>
+      <range min="0" max="500"/>
+      <summary>Animation duration</summary>
+      <description>Duration of the slide animation in milliseconds (0 to disable)</description>
+    </key>
+
+    <!-- Behavior -->
+    <key name="follow-mouse" type="b">
+      <default>true</default>
+      <summary>Follow mouse</summary>
+      <description>When enabled, terminal appears on the monitor where the mouse cursor is located</description>
+    </key>
+
+    <key name="smart-context-switch" type="b">
+      <default>true</default>
+      <summary>Smart context switch</summary>
+      <description>When terminal is visible on another monitor/workspace, shortcut moves it here instead of hiding</description>
+    </key>
+
+    <key name="always-on-top" type="b">
+      <default>true</default>
+      <summary>Always on top</summary>
+      <description>Keep the terminal window above other windows</description>
+    </key>
+
+    <key name="auto-hide-on-focus-loss" type="b">
+      <default>false</default>
+      <summary>Auto-hide on focus loss</summary>
+      <description>Automatically hide the terminal when it loses focus</description>
+    </key>
+
+    <key name="hide-from-taskbar" type="b">
+      <default>true</default>
+      <summary>Hide from taskbar</summary>
+      <description>Hide the terminal window from the taskbar/dash/panel</description>
+    </key>
+
+    <key name="remove-keybinding-conflicts" type="b">
+      <default>true</default>
+      <summary>Remove keybinding conflicts</summary>
+      <description>Automatically remove IBus and input-source keybindings that conflict with the toggle shortcut</description>
+    </key>
+
+  </schema>
+</schemalist>
