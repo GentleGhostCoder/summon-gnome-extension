@@ -23,7 +23,7 @@ export default [
         },
         rules: {
             // Relax rules that conflict with GJS patterns
-            'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+            'no-unused-vars': ['warn', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
             'no-constant-condition': 'off',
         },
     },
