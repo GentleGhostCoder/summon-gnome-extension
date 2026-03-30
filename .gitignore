@@ -1,3 +1,6 @@
 schemas/gschemas.compiled
 *.zip
 .claude/
+node_modules/
+package.json
+package-lock.json
