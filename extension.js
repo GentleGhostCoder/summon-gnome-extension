@@ -7,7 +7,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as AltTab from 'resource:///org/gnome/shell/ui/altTab.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const WM_CLASS = 'dropdown-terminal';
+const WM_CLASS = 'summon';
 
 export default class DropdownTerminalExtension extends Extension {
     _settings = null;
@@ -21,6 +21,7 @@ export default class DropdownTerminalExtension extends Extension {
     _pendingTimeouts = [];
     _conflictsRemoved = [];
     _origGetWindows = null;
+    _origGetWindowApp = null;
     _animating = false;
 
     enable() {
@@ -35,7 +36,7 @@ export default class DropdownTerminalExtension extends Extension {
                 this._onSettingChanged(key);
             });
         } catch (e) {
-            console.error(`[Dropdown Terminal] enable() error: ${e.message}`);
+            console.error(`[Summon] enable() error: ${e.message}`);
         }
     }
 
@@ -60,12 +61,20 @@ export default class DropdownTerminalExtension extends Extension {
             this._terminalWindow = null;
             this._settings = null;
         } catch (e) {
-            console.error(`[Dropdown Terminal] disable() error: ${e.message}`);
+            console.error(`[Summon] disable() error: ${e.message}`);
         }
     }
 
     _isEnabled() {
         return this._enabled && this._settings !== null;
+    }
+
+    _getBoolSetting(key, fallback = false) {
+        try {
+            return this._settings.get_boolean(key);
+        } catch (e) {
+            return fallback;
+        }
     }
 
     // --- GNOME 45-49 API compatibility helpers ---
@@ -121,7 +130,7 @@ export default class DropdownTerminalExtension extends Extension {
                 const filtered = triggers.filter(t => t !== ibusKey);
                 ibusSettings.set_strv('trigger', filtered);
                 this._conflictsRemoved.push({ schema: ibusSchema, key: 'trigger', value: ibusKey });
-                console.log(`[Dropdown Terminal] Removed conflicting IBus trigger: ${ibusKey}`);
+                console.log(`[Summon] Removed conflicting IBus trigger: ${ibusKey}`);
             }
         } catch (e) {
             // IBus not installed
@@ -136,7 +145,7 @@ export default class DropdownTerminalExtension extends Extension {
                     const filtered = bindings.filter(b => b !== shortcut);
                     wmSettings.set_strv(wmKey, filtered);
                     this._conflictsRemoved.push({ schema: wmSchema, key: wmKey, value: shortcut });
-                    console.log(`[Dropdown Terminal] Removed conflicting WM binding: ${wmKey} = ${shortcut}`);
+                    console.log(`[Summon] Removed conflicting WM binding: ${wmKey} = ${shortcut}`);
                 }
             }
         } catch (e) {
@@ -218,14 +227,14 @@ export default class DropdownTerminalExtension extends Extension {
         if (!this._terminalWindow) return;
 
         try {
-            if (!this._settings.get_boolean('auto-hide-on-focus-loss')) return;
+            if (!this._getBoolSetting('auto-hide-on-focus-loss')) return;
 
             const focusedWindow = global.display.focus_window;
             if (focusedWindow !== this._terminalWindow && this._isWindowVisible()) {
                 this._hideWindow();
             }
         } catch (e) {
-            console.error(`[Dropdown Terminal] focus change error: ${e.message}`);
+            console.error(`[Summon] focus change error: ${e.message}`);
         }
     }
 
@@ -306,7 +315,7 @@ export default class DropdownTerminalExtension extends Extension {
                     this._showWindow(win);
                 }
             } catch (e) {
-                console.error(`[Dropdown Terminal] window created error: ${e.message}`);
+                console.error(`[Summon] window created error: ${e.message}`);
             }
             return GLib.SOURCE_REMOVE;
         });
@@ -344,7 +353,7 @@ export default class DropdownTerminalExtension extends Extension {
 
         try {
             const hideFromTaskbar = this._settings.get_boolean('hide-from-taskbar');
-            const alwaysOnTop = this._settings.get_boolean('always-on-top');
+            const alwaysOnTop = this._getBoolSetting('always-on-top', true);
 
             if (hideFromTaskbar) {
                 this._terminalWindow.stick();
@@ -360,19 +369,28 @@ export default class DropdownTerminalExtension extends Extension {
                 this._terminalWindow.unmake_above();
             }
         } catch (e) {
-            console.error(`[Dropdown Terminal] window properties error: ${e.message}`);
+            console.error(`[Summon] window properties error: ${e.message}`);
         }
     }
 
     _installAltTabFilter() {
-        if (this._origGetWindows) return;
-
-        if (AltTab.getWindows) {
+        // Hide from Alt+Tab
+        if (!this._origGetWindows && AltTab.getWindows) {
             this._origGetWindows = AltTab.getWindows;
             AltTab.getWindows = (workspace) => {
                 return this._origGetWindows(workspace).filter(w =>
                     w.get_wm_class() !== WM_CLASS
                 );
+            };
+        }
+
+        // Hide from dash/panel (dash-to-panel, dash-to-dock, etc.)
+        if (!this._origGetWindowApp) {
+            const tracker = Shell.WindowTracker.get_default();
+            this._origGetWindowApp = tracker.get_window_app.bind(tracker);
+            tracker.get_window_app = (win) => {
+                if (win && win.get_wm_class() === WM_CLASS) return null;
+                return this._origGetWindowApp(win);
             };
         }
     }
@@ -381,6 +399,12 @@ export default class DropdownTerminalExtension extends Extension {
         if (this._origGetWindows) {
             AltTab.getWindows = this._origGetWindows;
             this._origGetWindows = null;
+        }
+
+        if (this._origGetWindowApp) {
+            const tracker = Shell.WindowTracker.get_default();
+            tracker.get_window_app = this._origGetWindowApp;
+            this._origGetWindowApp = null;
         }
     }
 
@@ -449,7 +473,7 @@ export default class DropdownTerminalExtension extends Extension {
                 this._spawnTerminal();
             }
         } catch (e) {
-            console.error(`[Dropdown Terminal] toggle error: ${e.message}`);
+            console.error(`[Summon] toggle error: ${e.message}`);
         }
     }
 
@@ -458,12 +482,12 @@ export default class DropdownTerminalExtension extends Extension {
         if (!this._terminalWindow) return;
 
         try {
-            if (this._settings.get_boolean('always-on-top')) {
+            if (this._getBoolSetting('always-on-top', true)) {
                 this._terminalWindow.make_above();
             }
             this._terminalWindow.activate(global.get_current_time());
         } catch (e) {
-            console.error(`[Dropdown Terminal] bring to front error: ${e.message}`);
+            console.error(`[Summon] bring to front error: ${e.message}`);
         }
     }
 
@@ -506,7 +530,7 @@ export default class DropdownTerminalExtension extends Extension {
 
     _activateWindow(win) {
         if (!this._isEnabled() || !win) return;
-        if (this._settings.get_boolean('always-on-top')) {
+        if (this._getBoolSetting('always-on-top', true)) {
             win.make_above();
         }
         win.activate(global.get_current_time());
@@ -556,12 +580,13 @@ export default class DropdownTerminalExtension extends Extension {
         }
         this._pendingTimeouts = [];
 
-        // Cancel running animation
-        if (this._animating && actor) {
+        // Always reset actor state — translation_y may be set from
+        // a pre-move hide or an in-progress animation
+        if (actor) {
             actor.remove_all_transitions();
             actor.translation_y = 0;
-            this._animating = false;
         }
+        this._animating = false;
     }
 
     _showWindow(win) {
@@ -588,7 +613,18 @@ export default class DropdownTerminalExtension extends Extension {
 
             const needsMonitorMove = win.get_monitor() !== rect.monitorIndex;
 
-            if (needsMonitorMove) {
+            // Check if we actually need to resize
+            const frame = win.get_frame_rect();
+            const needsResize = !rect.fullscreen &&
+                (frame.x !== rect.x || frame.y !== rect.y ||
+                 frame.width !== rect.width || frame.height !== rect.height);
+
+            if (needsMonitorMove && needsResize) {
+                // Different monitor AND different size — hide, move, defer resize
+                if (actor) {
+                    actor.translation_y = rect.position === 'bottom' ? actor.height : -actor.height;
+                }
+
                 win.move_to_monitor(rect.monitorIndex);
 
                 const timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
@@ -602,13 +638,20 @@ export default class DropdownTerminalExtension extends Extension {
                     return GLib.SOURCE_REMOVE;
                 });
                 this._pendingTimeouts.push(timeoutId);
+            } else if (needsMonitorMove) {
+                // Different monitor, same size — just move and animate, no defer needed
+                win.move_to_monitor(rect.monitorIndex);
+                this._applyWindowRect(win, rect);
+                this._activateWindow(win);
+                this._animateSlide(win, rect, true);
             } else {
+                // Same monitor
                 this._applyWindowRect(win, rect);
                 this._activateWindow(win);
                 this._animateSlide(win, rect, true);
             }
         } catch (e) {
-            console.error(`[Dropdown Terminal] show error: ${e.message}`);
+            console.error(`[Summon] show error: ${e.message}`);
         }
     }
 
@@ -629,7 +672,7 @@ export default class DropdownTerminalExtension extends Extension {
             }
             this._animateSlide(win, null, false);
         } catch (e) {
-            console.error(`[Dropdown Terminal] hide error: ${e.message}`);
+            console.error(`[Summon] hide error: ${e.message}`);
         }
     }
 
@@ -704,7 +747,7 @@ export default class DropdownTerminalExtension extends Extension {
                 const [ok, parsed] = GLib.shell_parse_argv(setting);
                 if (ok) return { argv: parsed, execFlag: null };
             } catch (e) {
-                console.warn(`[Dropdown Terminal] Failed to parse custom command: ${e.message}`);
+                console.warn(`[Summon] Failed to parse custom command: ${e.message}`);
             }
             return { argv: setting.split(/\s+/).filter(s => s), execFlag: null };
         }
@@ -715,7 +758,7 @@ export default class DropdownTerminalExtension extends Extension {
             const name = GLib.path_get_basename(envTerminal);
             const known = DropdownTerminalExtension.KNOWN_TERMINALS[name];
             if (known) return { argv: [...known.argv], execFlag: known.execFlag };
-            console.warn(`[Dropdown Terminal] Unknown terminal '${name}' from $TERMINAL — window detection requires WM class '${WM_CLASS}'`);
+            console.warn(`[Summon] Unknown terminal '${name}' from $TERMINAL — window detection requires WM class '${WM_CLASS}'`);
             return { argv: [envTerminal], execFlag: null };
         }
 
@@ -741,7 +784,7 @@ export default class DropdownTerminalExtension extends Extension {
             }
         }
 
-        console.error('[Dropdown Terminal] No terminal emulator found');
+        console.error('[Summon] No terminal emulator found');
         return null;
     }
 
@@ -760,7 +803,7 @@ export default class DropdownTerminalExtension extends Extension {
                 const [ok, parsed] = GLib.shell_parse_argv(terminalArgs);
                 if (ok) argv = argv.concat(parsed);
             } catch (e) {
-                console.warn(`[Dropdown Terminal] Failed to parse terminal-args: ${e.message}`);
+                console.warn(`[Summon] Failed to parse terminal-args: ${e.message}`);
                 argv = argv.concat(terminalArgs.split(/\s+/).filter(s => s));
             }
         }
@@ -775,7 +818,7 @@ export default class DropdownTerminalExtension extends Extension {
                     argv = argv.concat(parsed);
                 }
             } catch (e) {
-                console.warn(`[Dropdown Terminal] Failed to parse startup-command: ${e.message}`);
+                console.warn(`[Summon] Failed to parse startup-command: ${e.message}`);
             }
         }
 

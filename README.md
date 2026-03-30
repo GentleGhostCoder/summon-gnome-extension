@@ -1,4 +1,4 @@
-# Dropdown Terminal
+# Summon
 
 A Quake-style dropdown terminal extension for GNOME Shell (45-49). Toggle a terminal with a single keystroke -- it slides down from the top of your screen and disappears when you're done.
 
@@ -43,20 +43,20 @@ Existing solutions get one or two of these right. None get all of them. This ext
 
 ### From extensions.gnome.org (recommended)
 
-Visit [Dropdown Terminal on extensions.gnome.org](https://extensions.gnome.org/extension/XXXX/dropdown-terminal/) and toggle it on.
+Visit [Summon on extensions.gnome.org](https://extensions.gnome.org/extension/XXXX/summon/) and toggle it on.
 
 ### Manual install
 
 ```bash
-git clone https://github.com/chronolite/dropdown-terminal.git
-cd dropdown-terminal
+git clone https://github.com/GentleGhostCoder/summon-gnome-extension.git
+cd summon
 make install
 ```
 
 Then restart GNOME Shell (log out/in on Wayland) and enable:
 
 ```bash
-gnome-extensions enable dropdown-terminal@chronolite.tech
+gnome-extensions enable summon@semjon-geist.de
 ```
 
 ## Recommended Setup
@@ -121,7 +121,7 @@ Install TPM: `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`
 Open preferences with:
 
 ```bash
-gnome-extensions prefs dropdown-terminal@chronolite.tech
+gnome-extensions prefs summon@semjon-geist.de
 ```
 
 Recommended configuration:
@@ -181,7 +181,7 @@ All settings are accessible via the preferences UI or `dconf`:
 When using a custom command, you must include the WM class flag so the extension can identify its window:
 
 ```
-my-terminal --class dropdown-terminal
+my-terminal --class summon
 ```
 
 The exact flag varies by terminal (`--class`, `--app-id`, `--name`). Check your terminal's documentation.

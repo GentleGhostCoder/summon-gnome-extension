@@ -1,4 +1,4 @@
-UUID = dropdown-terminal@chronolite.tech
+UUID = summon@semjon-geist.de
 EXTENSION_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 SCHEMA_DIR = $(EXTENSION_DIR)/schemas
 ZIP_FILE = $(UUID).zip
@@ -12,7 +12,7 @@ all: build
 build: schemas/gschemas.compiled
 	@echo "Build complete"
 
-schemas/gschemas.compiled: schemas/org.gnome.shell.extensions.dropdown-terminal.gschema.xml
+schemas/gschemas.compiled: schemas/org.gnome.shell.extensions.summon.gschema.xml
 	glib-compile-schemas schemas/
 
 install: build
@@ -25,8 +25,8 @@ install: build
 	@cp extension.js $(EXTENSION_DIR)/
 	@cp prefs.js $(EXTENSION_DIR)/
 	@cp icon.svg $(EXTENSION_DIR)/
-	@cp icon.svg $(ICON_DIR)/dropdown-terminal.svg
-	@cp dropdown-terminal.desktop $(DESKTOP_DIR)/
+	@cp icon.svg $(ICON_DIR)/summon.svg
+	@cp summon.desktop $(DESKTOP_DIR)/
 	@cp schemas/*.xml $(SCHEMA_DIR)/
 	@cp schemas/gschemas.compiled $(SCHEMA_DIR)/
 	@echo "Installation complete"
@@ -39,8 +39,8 @@ install: build
 uninstall:
 	@echo "Removing extension from $(EXTENSION_DIR)"
 	@rm -rf $(EXTENSION_DIR)
-	@rm -f $(ICON_DIR)/dropdown-terminal.svg
-	@rm -f $(DESKTOP_DIR)/dropdown-terminal.desktop
+	@rm -f $(ICON_DIR)/summon.svg
+	@rm -f $(DESKTOP_DIR)/summon.desktop
 	@echo "Uninstall complete"
 
 clean:

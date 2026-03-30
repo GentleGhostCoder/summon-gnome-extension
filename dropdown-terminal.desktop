@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Dropdown Terminal
-Comment=Toggle a dropdown terminal
-Exec=gnome-extensions prefs dropdown-terminal@chronolite.tech
-Icon=dropdown-terminal
-Terminal=false
-Type=Application
-Categories=System;TerminalEmulator;

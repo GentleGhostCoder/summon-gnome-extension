@@ -1,9 +1,9 @@
 {
-  "name": "Dropdown Terminal",
-  "description": "Quake-style dropdown terminal with support for custom terminal emulators (Alacritty, Kitty, Wezterm, etc.)",
-  "uuid": "dropdown-terminal@chronolite.tech",
+  "name": "Summon",
+  "description": "Summon your terminal with a keystroke. Quake-style dropdown with multi-monitor intelligence, slide animations, and support for any terminal emulator.",
+  "uuid": "summon@semjon-geist.de",
   "shell-version": ["45", "46", "47", "48", "49"],
   "version": 2,
-  "url": "https://github.com/chronolite/dropdown-terminal",
-  "settings-schema": "org.gnome.shell.extensions.dropdown-terminal"
+  "url": "https://github.com/GentleGhostCoder/summon-gnome-extension",
+  "settings-schema": "org.gnome.shell.extensions.summon"
 }

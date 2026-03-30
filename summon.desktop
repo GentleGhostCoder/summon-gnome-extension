@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Summon
+Comment=Summon your terminal with a keystroke
+Exec=gnome-extensions prefs summon@semjon-geist.de
+Icon=summon
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;
