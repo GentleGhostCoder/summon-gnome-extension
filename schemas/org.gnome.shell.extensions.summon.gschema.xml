@@ -5,7 +5,7 @@
 
     <!-- Keybinding -->
     <key name="toggle-dropdown" type="as">
-      <default>['&lt;Control&gt;Return']</default>
+      <default>['&lt;Control&gt;space']</default>
       <summary>Toggle dropdown terminal</summary>
       <description>Keyboard shortcut to show/hide the dropdown terminal</description>
     </key>
@@ -38,7 +38,7 @@
     </key>
 
     <key name="height-percent" type="i">
-      <default>50</default>
+      <default>100</default>
       <range min="10" max="100"/>
       <summary>Height percentage</summary>
       <description>Height of the dropdown as percentage of monitor height</description>
@@ -57,13 +57,13 @@
     </key>
 
     <key name="fullscreen" type="b">
-      <default>false</default>
+      <default>true</default>
       <summary>Fullscreen</summary>
       <description>Maximize the terminal to fill the entire work area (respects panel/dock)</description>
     </key>
 
     <key name="animation-duration" type="i">
-      <default>150</default>
+      <default>0</default>
       <range min="0" max="500"/>
       <summary>Animation duration</summary>
       <description>Duration of the slide animation in milliseconds (0 to disable)</description>
@@ -83,7 +83,7 @@
     </key>
 
     <key name="always-on-top" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Always on top</summary>
       <description>Keep the terminal window above other windows</description>
     </key>

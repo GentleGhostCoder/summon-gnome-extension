@@ -131,14 +131,14 @@ Recommended configuration:
 | Terminal | `auto` or `alacritty` | Auto-detects the best available |
 | Startup Command | `tmux new-session -A -s main` | Attaches to existing session or creates one |
 | Width | `100%` | Full width |
-| Height | `50%` | Half screen |
+| Height | `100%` | Full height |
 | Position | `top` | Classic dropdown style |
-| Animation | `150ms` | Smooth but snappy |
+| Animation | `0` | Disabled (instant) |
 | Follow Mouse | On | Terminal appears on the active monitor |
 | Smart Context Switch | On | Moves terminal between monitors instead of hiding |
-| Always on Top | On | Stays above other windows |
+| Always on Top | Off | Behaves like a normal window when not focused |
 | Hide from Taskbar | On | Clean Alt+Tab, no dock entry |
-| Shortcut | `Ctrl+Space` | Quick access (change in Shortcut tab) |
+| Shortcut | `Ctrl+Space` | Default shortcut (change in Shortcut tab) |
 
 ### Zsh + Oh My Zsh
 
@@ -168,10 +168,10 @@ All settings are accessible via the preferences UI or `dconf`:
 | `position` | string | `top` | `top` or `bottom` |
 | `monitor` | string | `current` | `current`, `primary`, or monitor index (`0`, `1`, ...) |
 | `fullscreen` | bool | `false` | Maximize to fill entire work area |
-| `animation-duration` | int | `150` | Slide animation in ms (0 to disable) |
+| `animation-duration` | int | `0` | Slide animation in ms (0 to disable) |
 | `follow-mouse` | bool | `true` | Terminal appears on the monitor with the mouse |
 | `smart-context-switch` | bool | `true` | Move terminal to current monitor instead of hiding |
-| `always-on-top` | bool | `true` | Keep above other windows |
+| `always-on-top` | bool | `false` | Keep above other windows |
 | `auto-hide-on-focus-loss` | bool | `false` | Hide when another window gains focus |
 | `hide-from-taskbar` | bool | `true` | Hide from Alt+Tab and dock |
 | `remove-keybinding-conflicts` | bool | `true` | Auto-remove IBus/input-source conflicts |

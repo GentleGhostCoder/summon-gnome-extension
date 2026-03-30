@@ -309,7 +309,7 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
         // Reset button
         const resetRow = new Adw.ActionRow({
             title: 'Reset Shortcut',
-            subtitle: 'Reset to default (Ctrl+Enter)',
+            subtitle: 'Reset to default (Ctrl+Space)',
         });
 
         const resetButton = new Gtk.Button({
@@ -319,8 +319,8 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
         });
 
         resetButton.connect('clicked', () => {
-            settings.set_strv('toggle-dropdown', ['<Control>Return']);
-            shortcutRow.subtitle = '<Control>Return';
+            settings.set_strv('toggle-dropdown', ['<Control>space']);
+            shortcutRow.subtitle = '<Control>space';
         });
 
         resetRow.add_suffix(resetButton);
