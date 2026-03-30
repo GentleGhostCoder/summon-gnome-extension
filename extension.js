@@ -72,7 +72,7 @@ export default class DropdownTerminalExtension extends Extension {
     _getBoolSetting(key, fallback = false) {
         try {
             return this._settings.get_boolean(key);
-        } catch (e) {
+        } catch (_e) {
             return fallback;
         }
     }
@@ -132,7 +132,7 @@ export default class DropdownTerminalExtension extends Extension {
                 this._conflictsRemoved.push({ schema: ibusSchema, key: 'trigger', value: ibusKey });
                 console.log(`[Summon] Removed conflicting IBus trigger: ${ibusKey}`);
             }
-        } catch (e) {
+        } catch (_e) {
             // IBus not installed
         }
 
@@ -148,7 +148,7 @@ export default class DropdownTerminalExtension extends Extension {
                     console.log(`[Summon] Removed conflicting WM binding: ${wmKey} = ${shortcut}`);
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // Schema not available
         }
     }
@@ -162,7 +162,7 @@ export default class DropdownTerminalExtension extends Extension {
                     current.push(conflict.value);
                     settings.set_strv(conflict.key, current);
                 }
-            } catch (e) {
+            } catch (_e) {
                 // Schema not available
             }
         }
@@ -184,7 +184,7 @@ export default class DropdownTerminalExtension extends Extension {
     _unbindShortcut() {
         try {
             Main.wm.removeKeybinding(this._keybindingId);
-        } catch (e) {
+        } catch (_e) {
             // May not be bound
         }
     }
@@ -215,7 +215,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (this._windowDestroyId && this._terminalWindow) {
             try {
                 this._terminalWindow.disconnect(this._windowDestroyId);
-            } catch (e) {
+            } catch (_e) {
                 // Window may be destroyed
             }
             this._windowDestroyId = null;
@@ -283,7 +283,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (!win) return false;
         try {
             return win.get_wm_class() === WM_CLASS;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -299,7 +299,7 @@ export default class DropdownTerminalExtension extends Extension {
                 this._showWindow(win);
                 return;
             }
-        } catch (e) {
+        } catch (_e) {
             // WM class not set yet, fall through to deferred check
         }
 
@@ -330,7 +330,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (this._windowDestroyId && this._terminalWindow) {
             try {
                 this._terminalWindow.disconnect(this._windowDestroyId);
-            } catch (e) {
+            } catch (_e) {
                 // Old window may already be destroyed
             }
             this._windowDestroyId = null;
@@ -377,7 +377,7 @@ export default class DropdownTerminalExtension extends Extension {
         // Hide from Alt+Tab
         if (!this._origGetWindows && AltTab.getWindows) {
             this._origGetWindows = AltTab.getWindows;
-            AltTab.getWindows = (workspace) => {
+            AltTab.getWindows = (workspace) => { // eslint-disable-line no-import-assign
                 return this._origGetWindows(workspace).filter(w =>
                     w.get_wm_class() !== WM_CLASS
                 );
@@ -401,7 +401,7 @@ export default class DropdownTerminalExtension extends Extension {
 
     _removeAltTabFilter() {
         if (this._origGetWindows) {
-            AltTab.getWindows = this._origGetWindows;
+            AltTab.getWindows = this._origGetWindows; // eslint-disable-line no-import-assign
             this._origGetWindows = null;
         }
 
@@ -438,7 +438,7 @@ export default class DropdownTerminalExtension extends Extension {
             const windowMonitor = win.get_monitor();
 
             return onWorkspace && currentMonitor === windowMonitor;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -506,7 +506,7 @@ export default class DropdownTerminalExtension extends Extension {
             const actor = win.get_compositor_private();
 
             return onWorkspace && !minimized && actor?.visible;
-        } catch (e) {
+        } catch (_e) {
             return false;
         }
     }
@@ -540,7 +540,7 @@ export default class DropdownTerminalExtension extends Extension {
         win.activate(global.get_current_time());
     }
 
-    _getWindowRect(win) {
+    _getWindowRect(_win) {
         const monitorData = this._getMonitorGeometry();
         if (!monitorData) return null;
 
@@ -776,7 +776,7 @@ export default class DropdownTerminalExtension extends Extension {
                 if (known) return { argv: [...known.argv], execFlag: known.execFlag };
                 return { argv: [gnomeDefault], execFlag: null };
             }
-        } catch (e) {
+        } catch (_e) {
             // Schema not available
         }
 

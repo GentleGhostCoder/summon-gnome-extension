@@ -4,6 +4,10 @@ A Quake-style dropdown terminal extension for GNOME Shell (45-49). Toggle a term
 
 Works with any terminal emulator. Automatically detects what you have installed, or pick one explicitly. Designed for power users who live in the terminal.
 
+## Demo
+
+<video src="demo.mp4" controls width="100%"></video>
+
 ## Why This Extension Exists
 
 There are existing dropdown terminal solutions for GNOME -- ddterm, Guake, Yakuake, built-in terminal emulator drop-down modes. None of them got the full picture right. This extension was built to fill that gap.
