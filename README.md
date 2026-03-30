@@ -6,7 +6,7 @@ Works with any terminal emulator. Automatically detects what you have installed,
 
 ## Demo
 
-https://github.com/GentleGhostCoder/summon-gnome-extension/raw/main/demo.mp4
+![Demo](demo.gif)
 
 ## Why This Extension Exists
 
