@@ -21,7 +21,6 @@ export default class DropdownTerminalExtension extends Extension {
     _pendingTimeouts = [];
     _conflictsRemoved = [];
     _origGetWindows = null;
-    _origGetWindowApp = null;
     _animating = false;
 
     enable() {
@@ -383,28 +382,12 @@ export default class DropdownTerminalExtension extends Extension {
                 );
             };
         }
-
-        // Hide from dash/panel (dash-to-panel, dash-to-dock, etc.)
-        if (!this._origGetWindowApp) {
-            const tracker = Shell.WindowTracker.get_default();
-            this._origGetWindowApp = tracker.get_window_app.bind(tracker);
-            tracker.get_window_app = (win) => {
-                if (win && win.get_wm_class() === WM_CLASS) return null;
-                return this._origGetWindowApp(win);
-            };
-        }
     }
 
     _removeAltTabFilter() {
         if (this._origGetWindows) {
             AltTab.getWindows = this._origGetWindows;
             this._origGetWindows = null;
-        }
-
-        if (this._origGetWindowApp) {
-            const tracker = Shell.WindowTracker.get_default();
-            tracker.get_window_app = this._origGetWindowApp;
-            this._origGetWindowApp = null;
         }
     }
 
