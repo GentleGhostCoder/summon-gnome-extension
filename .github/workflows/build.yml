@@ -1,0 +1,96 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install ESLint
+        run: npm install --save-dev eslint @eslint/js globals
+
+      - name: Run ESLint
+        run: npx eslint extension.js prefs.js
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-bin
+
+      - name: Compile schemas
+        run: glib-compile-schemas schemas/
+
+      - name: Validate metadata.json
+        run: |
+          node -e "
+            const meta = require('./metadata.json');
+            const required = ['name', 'uuid', 'description', 'shell-version', 'url'];
+            const missing = required.filter(k => !meta[k]);
+            if (missing.length) { console.error('Missing fields:', missing); process.exit(1); }
+            if (meta.version != null) { console.error('Remove deprecated version field from metadata.json'); process.exit(1); }
+            if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/.test(meta.uuid)) { console.error('Invalid UUID format'); process.exit(1); }
+            console.log('metadata.json OK');
+          "
+
+      - name: Validate schema ID and path
+        run: |
+          grep -q 'id="org.gnome.shell.extensions.' schemas/*.gschema.xml || { echo "Schema ID must use org.gnome.shell.extensions base"; exit 1; }
+          grep -q 'path="/org/gnome/shell/extensions/' schemas/*.gschema.xml || { echo "Schema path must use /org/gnome/shell/extensions/ base"; exit 1; }
+          echo "Schema ID and path OK"
+
+      - name: Check for prohibited imports in extension.js
+        run: |
+          if grep -qE "from\s+['\"]gi://(Gdk|Gtk|Adw)" extension.js; then
+            echo "ERROR: extension.js must not import Gdk, Gtk, or Adw"
+            exit 1
+          fi
+          echo "No prohibited imports in extension.js"
+
+      - name: Check for prohibited imports in prefs.js
+        run: |
+          if grep -qE "from\s+['\"]gi://(Clutter|Meta|St|Shell)" prefs.js; then
+            echo "ERROR: prefs.js must not import Clutter, Meta, St, or Shell"
+            exit 1
+          fi
+          echo "No prohibited imports in prefs.js"
+
+      - name: Check for excessive logging
+        run: |
+          count=$(grep -cE 'console\.(log|info)\b' extension.js || true)
+          if [ "$count" -gt 5 ]; then
+            echo "WARNING: $count console.log/info calls found — reviewers may flag excessive logging"
+            grep -nE 'console\.(log|info)\b' extension.js
+            exit 1
+          fi
+          echo "Logging check OK ($count console.log/info calls)"
+
+      - name: Build extension zip
+        run: |
+          zip -r summon@semjon-geist.de.zip \
+            metadata.json extension.js prefs.js icon.svg schemas/
+
+      - name: Validate zip contents
+        run: |
+          echo "=== Zip contents ==="
+          unzip -l summon@semjon-geist.de.zip
+          # Ensure no unwanted files
+          if unzip -l summon@semjon-geist.de.zip | grep -qE '\.(md|yml|mjs|desktop)$|Makefile|node_modules|\.git'; then
+            echo "ERROR: Zip contains files that should not be submitted"
+            exit 1
+          fi
+          echo "Zip contents OK"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: summon@semjon-geist.de.zip

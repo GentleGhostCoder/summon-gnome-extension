@@ -130,7 +130,7 @@ export default class DropdownTerminalExtension extends Extension {
                 const filtered = triggers.filter(t => t !== ibusKey);
                 ibusSettings.set_strv('trigger', filtered);
                 this._conflictsRemoved.push({ schema: ibusSchema, key: 'trigger', value: ibusKey });
-                console.log(`[Summon] Removed conflicting IBus trigger: ${ibusKey}`);
+                console.debug(`[Summon] Removed conflicting IBus trigger: ${ibusKey}`);
             }
         } catch (_e) {
             // IBus not installed
@@ -145,7 +145,7 @@ export default class DropdownTerminalExtension extends Extension {
                     const filtered = bindings.filter(b => b !== shortcut);
                     wmSettings.set_strv(wmKey, filtered);
                     this._conflictsRemoved.push({ schema: wmSchema, key: wmKey, value: shortcut });
-                    console.log(`[Summon] Removed conflicting WM binding: ${wmKey} = ${shortcut}`);
+                    console.debug(`[Summon] Removed conflicting WM binding: ${wmKey} = ${shortcut}`);
                 }
             }
         } catch (_e) {
