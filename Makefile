@@ -61,7 +61,7 @@ disable:
 pack: build
 	@echo "Creating extension package..."
 	@rm -f $(ZIP_FILE)
-	@zip -r $(ZIP_FILE) metadata.json extension.js prefs.js icon.svg schemas/
+	@zip -r $(ZIP_FILE) metadata.json extension.js prefs.js icon.svg schemas/ -x schemas/gschemas.compiled
 	@echo "Package created: $(ZIP_FILE)"
 
 prefs:

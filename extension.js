@@ -9,6 +9,9 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const WM_CLASS = 'summon';
 
+// GNOME 45-48 backward compat: Meta.MaximizeFlags was removed in GNOME 49
+const MAXIMIZE_BOTH = Meta.MaximizeFlags?.BOTH ?? 3;
+
 export default class DropdownTerminalExtension extends Extension {
     _settings = null;
     _settingsChangedId = null;
@@ -83,7 +86,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (typeof win.get_maximize_flags === 'function') {
             win.maximize();
         } else {
-            win.maximize(Meta.MaximizeFlags.BOTH);
+            win.maximize(MAXIMIZE_BOTH);
         }
     }
 
@@ -91,7 +94,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (typeof win.get_maximize_flags === 'function') {
             win.unmaximize();
         } else {
-            win.unmaximize(Meta.MaximizeFlags.BOTH);
+            win.unmaximize(MAXIMIZE_BOTH);
         }
     }
 
@@ -99,10 +102,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (typeof win.get_maximize_flags === 'function') {
             return win.get_maximize_flags() !== 0;
         }
-        if (typeof win.get_maximized === 'function') {
-            return win.get_maximized() !== 0;
-        }
-        return false;
+        return (win.get_maximized?.() ?? 0) !== 0;
     }
 
     // --- Keybinding conflict management ---
