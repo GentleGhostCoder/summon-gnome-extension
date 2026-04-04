@@ -102,7 +102,7 @@ export default class DropdownTerminalExtension extends Extension {
         if (typeof win.get_maximize_flags === 'function') {
             return win.get_maximize_flags() !== 0;
         }
-        return (win.get_maximized?.() ?? 0) !== 0;
+        return win.maximized_horizontally || win.maximized_vertically;
     }
 
     // --- Keybinding conflict management ---

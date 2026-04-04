@@ -79,7 +79,8 @@ jobs:
       - name: Build extension zip
         run: |
           zip -r summon@semjon-geist.de.zip \
-            metadata.json extension.js prefs.js icon.svg schemas/
+            metadata.json extension.js prefs.js icon.svg schemas/ \
+            -x schemas/gschemas.compiled
 
       - name: Validate zip contents
         run: |
@@ -93,7 +94,7 @@ jobs:
           echo "Zip contents OK"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: extension-zip
           path: summon@semjon-geist.de.zip
