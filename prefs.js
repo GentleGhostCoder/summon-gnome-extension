@@ -338,6 +338,7 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
         dialog.add_response('cancel', 'Cancel');
 
         const controller = new Gtk.EventControllerKey();
+        controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE);
         controller.connect('key-pressed', (_, keyval, keycode, state) => {
             const mask = state & Gtk.accelerator_get_default_mod_mask();
 
