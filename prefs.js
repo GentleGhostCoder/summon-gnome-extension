@@ -289,21 +289,22 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
         // Shortcut display
         const currentShortcut = settings.get_strv('toggle-dropdown')[0] || '';
 
-        const shortcutRow = new Adw.ActionRow({
-            title: 'Toggle Shortcut',
-            subtitle: currentShortcut || 'Not set',
-        });
-
-        const shortcutButton = new Gtk.Button({
-            label: 'Set Shortcut',
+        const shortcutLabel = new Gtk.ShortcutLabel({
+            accelerator: currentShortcut,
+            disabled_text: 'Not set',
             valign: Gtk.Align.CENTER,
         });
 
-        shortcutButton.connect('clicked', () => {
-            this._showShortcutDialog(window, settings, shortcutRow);
+        const shortcutRow = new Adw.ActionRow({
+            title: 'Toggle Shortcut',
+            activatable: true,
         });
 
-        shortcutRow.add_suffix(shortcutButton);
+        shortcutRow.add_suffix(shortcutLabel);
+        shortcutRow.connect('activated', () => {
+            this._showShortcutDialog(window, settings, shortcutLabel);
+        });
+
         shortcutGroup.add(shortcutRow);
 
         // Reset button
@@ -320,22 +321,30 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
 
         resetButton.connect('clicked', () => {
             settings.set_strv('toggle-dropdown', ['<Control>space']);
-            shortcutRow.subtitle = '<Control>space';
+            shortcutLabel.accelerator = '<Control>space';
         });
 
         resetRow.add_suffix(resetButton);
         shortcutGroup.add(resetRow);
     }
 
-    _showShortcutDialog(window, settings, shortcutRow) {
-        const dialog = new Adw.MessageDialog({
-            heading: 'Set Shortcut',
-            body: 'Press the key combination you want to use',
+    _showShortcutDialog(window, settings, shortcutLabel) {
+        const dialog = new Gtk.Window({
+            title: 'Set Shortcut',
             transient_for: window,
             modal: true,
+            default_width: 400,
+            default_height: 150,
+            resizable: false,
         });
 
-        dialog.add_response('cancel', 'Cancel');
+        const label = new Gtk.Label({
+            label: 'Press the key combination you want to use\n\nPress Escape to cancel',
+            justify: Gtk.Justification.CENTER,
+            valign: Gtk.Align.CENTER,
+            vexpand: true,
+        });
+        dialog.set_child(label);
 
         const controller = new Gtk.EventControllerKey();
         controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE);
@@ -361,7 +370,7 @@ export default class DropdownTerminalPreferences extends ExtensionPreferences {
             const accel = Gtk.accelerator_name(keyval, mask);
             if (accel && accel !== '') {
                 settings.set_strv('toggle-dropdown', [accel]);
-                shortcutRow.subtitle = accel;
+                shortcutLabel.accelerator = accel;
                 dialog.close();
             }
             return true;
